@@ -58,4 +58,4 @@ python src/build_dashboard.py    # regenerates docs/index.html (~100 KB, plotly.
 pytest tests/                    # build + data-cleaning tests (CI on every push)
 ```
 
-Open `docs/index.html` in any browser, or serve it with GitHub Pages (Settings → Pages → deploy from `main`/`docs`) for a live link to put on a resume. The build is fully reproducible from `data/HDR21-22_HDI.csv`; the tests caught (and now guard against) the raw export's comma-formatted GNI values silently becoming NaN.
+**Live version: <https://nikkat-afrin.github.io/hdi-global-policy-analysis/>** (GitHub Pages, deployed from `main`/`docs`). The build is fully reproducible from `data/HDR21-22_HDI.csv`; the tests caught (and now guard against) the raw export's comma-formatted GNI values silently becoming NaN.
