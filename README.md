@@ -2,7 +2,7 @@
 
 **An exploratory and analytical study of the UN's Human Development Index across 195 countries (HDR 2021–22): what drives human development, and which countries outperform their income.**
 
-![Python](https://img.shields.io/badge/Python-3.12-blue) ![Analysis](https://img.shields.io/badge/Analysis-EDA%20%2B%20Regression-orange) ![Domain](https://img.shields.io/badge/Domain-Development%20Economics-green)
+![Python](https://img.shields.io/badge/Python-3.12-blue) ![Analysis](https://img.shields.io/badge/Analysis-EDA%20%2B%20Regression-orange) ![Domain](https://img.shields.io/badge/Domain-Development%20Economics-green) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
