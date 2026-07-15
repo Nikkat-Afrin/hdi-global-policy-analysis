@@ -111,37 +111,60 @@ def build_figures(df: pd.DataFrame) -> list[go.Figure]:
     return figs
 
 
+CSS = """
+ body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; margin: 0;
+        background: #f4f6f9; color: #1c2733; }
+ header { padding: 26px 34px 6px; }
+ h1 { margin: 0 0 4px; font-size: 25px; }
+ .sub { color: #5c6b7a; font-size: 14px; max-width: 920px; }
+ .kpis { display: flex; gap: 14px; padding: 16px 34px 0; flex-wrap: wrap; }
+ .kpi { background: white; border-radius: 10px; padding: 12px 20px;
+        box-shadow: 0 1px 4px rgba(20,40,80,.08); min-width: 150px; }
+ .kpi .v { font-size: 22px; font-weight: 700; color: #0b5fff; }
+ .kpi .l { font-size: 12px; color: #5c6b7a; }
+ .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(470px, 1fr));
+         gap: 18px; padding: 18px 34px 36px; }
+ .card { background: white; border-radius: 10px; padding: 6px;
+         box-shadow: 0 1px 4px rgba(20,40,80,.08); }
+ .wide { grid-column: 1 / -1; }
+ footer { padding: 0 34px 26px; color: #8595a5; font-size: 13px; }
+"""
+
+
 def render(figs: list[go.Figure], df: pd.DataFrame) -> str:
-    parts = ["""<!DOCTYPE html>
+    top = df.loc[df["HDI Value"].idxmax()]
+    bottom = df.loc[df["HDI Value"].idxmin()]
+    gap = df["Expected years of schooling"] - df["Mean years of schooling"]
+    kpis = [
+        (f"{len(df)}", "countries covered"),
+        (f"{df['HDI Value'].median():.3f}", "median HDI"),
+        (f"{top['Country']} ({top['HDI Value']:.3f})", "highest HDI"),
+        (f"{bottom['Country']} ({bottom['HDI Value']:.3f})", "lowest HDI"),
+        (f"{gap.mean():.1f} yrs", "avg expected-vs-attained schooling gap"),
+    ]
+    kpi_html = "".join(
+        f'<div class="kpi"><div class="v">{v}</div><div class="l">{l}</div></div>'
+        for v, l in kpis)
+    charts = []
+    for i, fig in enumerate(figs):
+        cls = "card wide" if i == 0 else "card"
+        inner = fig.to_html(full_html=False, include_plotlyjs="cdn" if i == 0 else False,
+                            div_id=f"chart-{i}", default_height="520px" if i == 0 else "460px")
+        charts.append(f'<div class="{cls}">{inner}</div>')
+    return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Global HDI Dashboard</title>
-<style>
- body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; margin: 0;
-        background: #fafafa; color: #222; }
- header { padding: 24px 32px 8px; }
- h1 { margin: 0 0 4px; font-size: 26px; }
- .sub { color: #666; font-size: 14px; }
- .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-         gap: 20px; padding: 20px 32px 40px; }
- .card { background: white; border-radius: 10px; padding: 8px;
-         box-shadow: 0 1px 4px rgba(0,0,0,.08); }
- footer { padding: 0 32px 28px; color: #888; font-size: 13px; }
-</style></head><body>
-<header>
- <h1>Global Human Development Dashboard</h1>
- <div class="sub">UNDP Human Development Report 2021&ndash;22 &middot; """
-              + f"{len(df)} countries &middot; interactive (hover, zoom, pan)</div>"
-              + "</header><div class=\"grid\">"]
-    for i, fig in enumerate(figs):
-        inner = fig.to_html(full_html=False, include_plotlyjs="cdn" if i == 0 else False,
-                            div_id=f"chart-{i}", default_height="480px")
-        parts.append(f'<div class="card">{inner}</div>')
-    parts.append("""</div>
+<title>Global HDI Dashboard</title><style>{CSS}</style></head><body>
+<header><h1>Global Human Development Dashboard</h1>
+<div class="sub">UNDP Human Development Report 2021&ndash;22 &middot; interactive
+(hover, zoom, pan). The choropleth maps the composite index; the scatter shows the
+income-development relationship the HDI was designed to look beyond.</div>
+</header>
+<div class="kpis">{kpi_html}</div>
+<div class="grid">{''.join(charts)}</div>
 <footer>Built with Plotly from <code>data/HDR21-22_HDI.csv</code> &middot;
 regenerate with <code>python src/build_dashboard.py</code></footer>
-</body></html>""")
-    return "".join(parts)
+</body></html>"""
 
 
 def main() -> None:
