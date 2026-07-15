@@ -41,7 +41,7 @@ def test_four_figures_built(df):
 def test_render_is_selfcontained_html(df):
     html = render(build_figures(df), df)
     assert html.startswith("<!DOCTYPE html>")
-    assert html.count('class="card"') == 4
+    assert html.count('class="card') == 4
     assert "plotly" in html.lower()
     # CDN script included exactly once (charts 2-4 reuse it)
     assert html.count("cdn.plot.ly") == 1
